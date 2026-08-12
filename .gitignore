@@ -33,7 +33,7 @@ dist/
 # Tauri
 src-tauri/target/
 src-tauri/.DS_Store
-
+.DS_Store
 # IDEs
 .vscode/
 .idea/
@@ -52,3 +52,8 @@ Thumbs.db
 *.dmg
 *.exe
 dist/
+
+
+
+
+
