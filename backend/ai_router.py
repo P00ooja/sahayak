@@ -12,6 +12,7 @@ def is_internet_available() -> bool:
 
 async def get_answer(question: str) -> dict:
     """Route to online or offline AI"""
+
     offline = not is_internet_available()
     
     if offline:
@@ -26,3 +27,34 @@ async def get_answer(question: str) -> dict:
         "offline": offline,
         "model": model
     }
+
+
+
+
+########debug prints##########
+# async def get_answer(question: str) -> dict:
+#     print("Router entered")
+
+#     internet = is_internet_available()
+#     print("Internet =", internet)
+
+#     offline = not internet
+
+#     if offline:
+#         print("Calling Ollama")
+#         answer = await call_ollama(question)
+#         print("Ollama finished")
+#         model = "ollama"
+#     else:
+#         print("Calling Gemini")
+#         answer = await call_gemini(question)
+#         print("Gemini finished")
+#         model = "gemini"
+
+#     print("Returning router result")
+
+#     return {
+#         "answer": answer,
+#         "offline": offline,
+#         "model": model
+#     }

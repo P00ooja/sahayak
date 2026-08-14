@@ -78,10 +78,16 @@ async def ask_question(data: dict):
         if not chat_id or not question:
             raise HTTPException(status_code=400, detail="Missing chat_id or question")
         
-        # Call AI router (online or offline)
+        # print("1. Request received")
+
         from ai_router import get_answer
+
+        # print("2. Calling AI router")
+
         ai_response = await get_answer(question)
         
+        # print("3. AI router returned")
+
         answer = ai_response["answer"]
         offline = ai_response["offline"]
         model = ai_response["model"]
@@ -90,15 +96,15 @@ async def ask_question(data: dict):
         
         conn = get_connection()
         cursor = conn.cursor()
-        
+        # print("4. Saving to database")
         cursor.execute(
             """INSERT INTO messages (id, chat_id, question, answer, offline, model) 
                VALUES (?, ?, ?, ?, ?, ?)""",
-            (message_id, chat_id, question, answer, offline,model)
+            (message_id, chat_id, question, answer, offline, model)
         )
         conn.commit()
         conn.close()
-        
+
         return {
             "message_id": message_id,
             "chat_id": chat_id,
@@ -112,6 +118,50 @@ async def ask_question(data: dict):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+# @app.post("/api/qa/ask")
+# async def ask_question(data: dict):
+#     """Ask a question in a chat"""
+#     try:
+#         chat_id = data.get("chat_id")
+#         question = data.get("question")
+        
+#         if not chat_id or not question:
+#             raise HTTPException(status_code=400, detail="Missing chat_id or question")
+        
+#         # Call AI router (online or offline)
+#         from ai_router import get_answer
+#         ai_response = await get_answer(question)
+        
+#         answer = ai_response["answer"]
+#         offline = ai_response["offline"]
+#         model = ai_response["model"]
+        
+#         message_id = str(uuid.uuid4())
+        
+#         conn = get_connection()
+#         cursor = conn.cursor()
+        
+#         cursor.execute(
+#             """INSERT INTO messages (id, chat_id, question, answer, offline, model) 
+#                VALUES (?, ?, ?, ?, ?, ?)""",
+#             (message_id, chat_id, question, answer, offline,model)
+#         )
+#         conn.commit()
+#         conn.close()
+        
+#         return {
+#             "message_id": message_id,
+#             "chat_id": chat_id,
+#             "question": question,
+#             "answer": answer,
+#             "offline": offline,
+#             "model": model,
+#             "created_at": datetime.now().isoformat()
+#         }
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/qa/history/{chat_id}")
 async def get_chat_history(chat_id: str):
