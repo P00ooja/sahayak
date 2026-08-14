@@ -66,6 +66,8 @@ async def create_new_chat():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+
 @app.post("/api/qa/ask")
 async def ask_question(data: dict):
     """Ask a question in a chat"""
@@ -76,9 +78,13 @@ async def ask_question(data: dict):
         if not chat_id or not question:
             raise HTTPException(status_code=400, detail="Missing chat_id or question")
         
-        # TODO: Call LLM (Ollama or Gemini)
-        # For now, return placeholder
-        answer = "This is a placeholder response. Week 2 Day 3 will add Ollama integration."
+        # Call AI router (online or offline)
+        from ai_router import get_answer
+        ai_response = await get_answer(question)
+        
+        answer = ai_response["answer"]
+        offline = ai_response["offline"]
+        model = ai_response["model"]
         
         message_id = str(uuid.uuid4())
         
@@ -88,7 +94,7 @@ async def ask_question(data: dict):
         cursor.execute(
             """INSERT INTO messages (id, chat_id, question, answer, offline, model) 
                VALUES (?, ?, ?, ?, ?, ?)""",
-            (message_id, chat_id, question, answer, False, "placeholder")
+            (message_id, chat_id, question, answer, offline,model)
         )
         conn.commit()
         conn.close()
@@ -98,8 +104,8 @@ async def ask_question(data: dict):
             "chat_id": chat_id,
             "question": question,
             "answer": answer,
-            "offline": False,
-            "model": "placeholder",
+            "offline": offline,
+            "model": model,
             "created_at": datetime.now().isoformat()
         }
     except HTTPException:
