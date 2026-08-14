@@ -44,6 +44,9 @@ src-tauri/.DS_Store
 Thumbs.db
 
 # Environment
+backend/.env
+
+
 .env
 .env.local
 .env.*.local
