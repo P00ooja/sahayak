@@ -64,7 +64,7 @@
 
 import { FileText, BookOpen, MessageSquare, Gamepad2, ChevronRight } from 'lucide-react';
 
-export default function Dashboard() {
+export default function Dashboard({ onNavigate }) {
   return (
     <div className="space-y-12 max-w-6xl mx-auto">
       {/* Header Section */}
@@ -113,6 +113,7 @@ export default function Dashboard() {
             icon={MessageSquare}
             title="Q&A Assistant"
             description="Ask teaching questions and get instant, intelligent answers"
+            onClick={() => onNavigate('qa')}
             color="green"
           />
           <FeatureCard
@@ -120,7 +121,9 @@ export default function Dashboard() {
             title="Game Zone"
             description="Generate interactive educational games and quizzes for students"
             color="orange"
+
           />
+
         </div>
       </div>
 
@@ -137,7 +140,7 @@ export default function Dashboard() {
   );
 }
 
-function FeatureCard({ icon: Icon, title, description, color }) {
+function FeatureCard({ icon: Icon, title, description,onClick = () => {}, color }) {
   const colorClasses = {
     blue: 'hover:border-blue-500 hover:shadow-blue-500/20',
     purple: 'hover:border-purple-500 hover:shadow-purple-500/20',
@@ -153,7 +156,11 @@ function FeatureCard({ icon: Icon, title, description, color }) {
   };
 
   return (
-    <button className={`group bg-gray-800 border border-gray-700 rounded-xl p-6 text-left transition-all hover:shadow-2xl ${colorClasses[color]}`}>
+    <button 
+    onClick={onClick}
+    className={`group bg-gray-800 border border-gray-700 rounded-xl p-6 text-left transition-all hover:shadow-2xl ${colorClasses[color]}`}
+  >
+    {/* <button className={`group bg-gray-800 border border-gray-700 rounded-xl p-6 text-left transition-all hover:shadow-2xl ${colorClasses[color]}`}> */}
       <Icon size={40} className={`${iconColors[color]} mb-4 group-hover:scale-110 transition-transform`} />
       <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-white">
         {title}
