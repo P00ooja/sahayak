@@ -78,16 +78,21 @@ async def ask_question(data: dict):
         if not chat_id or not question:
             raise HTTPException(status_code=400, detail="Missing chat_id or question")
         
-        # print("1. Request received")
+        # 1. Fetch previous conversation history for this chat session
+        conn = get_connection()
+        conn.row_factory = dict_factory
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT question, answer FROM messages WHERE chat_id = ? ORDER BY created_at ASC",
+            (chat_id,)
+        )
+        history = cursor.fetchall()
+        conn.close()
 
+        # 2. Call AI router with question and history
         from ai_router import get_answer
-
-        # print("2. Calling AI router")
-
-        ai_response = await get_answer(question)
+        ai_response = await get_answer(question, history=history)
         
-        # print("3. AI router returned")
-
         answer = ai_response["answer"]
         offline = ai_response["offline"]
         model = ai_response["model"]
@@ -96,7 +101,6 @@ async def ask_question(data: dict):
         
         conn = get_connection()
         cursor = conn.cursor()
-        # print("4. Saving to database")
         cursor.execute(
             """INSERT INTO messages (id, chat_id, question, answer, offline, model) 
                VALUES (?, ?, ?, ?, ?, ?)""",
@@ -114,6 +118,7 @@ async def ask_question(data: dict):
             "model": model,
             "created_at": datetime.now().isoformat()
         }
+
     except HTTPException:
         raise
     except Exception as e:

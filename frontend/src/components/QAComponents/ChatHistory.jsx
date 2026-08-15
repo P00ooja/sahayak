@@ -19,9 +19,9 @@ export default function ChatHistory({ chats, currentChat, onSelectChat, onNewCha
         {chats.length === 0 ? (
           <p className="text-gray-400 text-sm text-center mt-4">No chats yet</p>
         ) : (
-          chats.map((chat) => (
+          chats.map((chat, idx) => (
             <button
-              key={chat.chat_id}
+              key={chat.chat_id || idx}
               onClick={() => onSelectChat(chat.chat_id)}
               className={`w-full text-left p-3 rounded-lg mb-2 transition-colors ${
                 currentChat === chat.chat_id

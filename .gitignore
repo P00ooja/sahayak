@@ -56,6 +56,8 @@ backend/.env
 *.exe
 dist/
 
+# Database
+*.db
 
 
 

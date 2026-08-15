@@ -1,3 +1,4 @@
+import asyncio
 import socket
 from ollama_client import call_ollama
 from gemini_client import call_gemini
@@ -10,16 +11,17 @@ def is_internet_available() -> bool:
     except:
         return False
 
-async def get_answer(question: str) -> dict:
+async def get_answer(question: str, history: list = None) -> dict:
     """Route to online or offline AI"""
 
-    offline = not is_internet_available()
+    has_internet = await asyncio.to_thread(is_internet_available)
+    offline = not has_internet
     
     if offline:
-        answer = await call_ollama(question)
+        answer = await call_ollama(question, history=history)
         model = "ollama"
     else:
-        answer = await call_gemini(question)
+        answer = await call_gemini(question, history=history)
         model = "gemini"
     
     return {
@@ -27,6 +29,8 @@ async def get_answer(question: str) -> dict:
         "offline": offline,
         "model": model
     }
+
+
 
 
 
