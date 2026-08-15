@@ -21,9 +21,37 @@ Sahayak empowers teachers in low-resource environments with intelligent classroo
 - **Online AI**: Gemini API
 - **Database**: SQLite
 
-## Getting Started
+## Quick Start
 
-See [docs/SETUP.md](docs/SETUP.md) for detailed setup instructions.
+### 1. Clone & Setup Backend
+```bash
+git clone https://github.com/P00ooja/sahayak.git
+cd sahayak/backend
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+# Create .env from template and add your GEMINI_API_KEY
+cp .env.example .env
+python main.py
+```
+
+### 2. Setup & Run Frontend
+In a new terminal:
+```bash
+cd sahayak/frontend
+npm install
+npm run dev
+```
+
+### 3. Setup Offline AI (Optional)
+Install [Ollama](https://ollama.com) and pull `phi`:
+```bash
+ollama pull phi
+```
+
+For detailed instructions and troubleshooting, see [docs/SETUP.md](docs/SETUP.md).
+
 
 ## Project Status
 

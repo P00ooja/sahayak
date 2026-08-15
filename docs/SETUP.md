@@ -13,25 +13,15 @@ Complete these steps to set up Sahayak for development.
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/sahayak.git
+git clone https://github.com/P00ooja/sahayak.git
 cd sahayak
 ```
 
-### 2. Setup Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open http://localhost:5173 to see the app running.
-
-### 3. Setup Backend (Week 2+)
+### 2. Setup Backend
 
 ```bash
 cd backend
-python -m venv venv
+python3 -m venv venv
 
 # On macOS/Linux:
 source venv/bin/activate
@@ -40,10 +30,47 @@ source venv/bin/activate
 venv\Scripts\activate
 
 pip install -r requirements.txt
-python main.py
 ```
 
-Backend will run on http://localhost:8000
+#### Configure Environment Variables (`.env`):
+Create a `.env` file inside the `backend` folder (or copy from `.env.example`):
+```bash
+cp .env.example .env
+```
+Open `backend/.env` and add your Gemini API key:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=phi
+DEBUG=True
+DATABASE_PATH=sahayak.db
+```
+
+#### Run Backend Server:
+```bash
+python main.py
+```
+*(Backend will run on http://localhost:8000)*
+
+### 3. Setup Frontend
+
+Open a new terminal window:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*(Frontend will run on http://localhost:5173)*
+
+### 4. Setup Offline AI (Ollama)
+For offline Q&A responses:
+1. Install Ollama from [ollama.com](https://ollama.com) or via Homebrew (`brew install ollama`).
+2. Pull the model specified in `.env` (default is `phi`):
+   ```bash
+   ollama pull phi
+   ```
+3. Ensure Ollama is running (`ollama serve`).
+
 
 ## Development Workflow
 
