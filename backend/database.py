@@ -14,10 +14,18 @@ def init_db():
         CREATE TABLE IF NOT EXISTS chats (
             id TEXT PRIMARY KEY,
             title TEXT,
+            is_saved BOOLEAN DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    
+    # Ensure is_saved column exists for existing DBs
+    try:
+        cursor.execute("ALTER TABLE chats ADD COLUMN is_saved BOOLEAN DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
+
     
     # Messages table
     cursor.execute("""

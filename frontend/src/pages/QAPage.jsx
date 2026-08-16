@@ -215,14 +215,19 @@ export default function QAPage() {
     try {
       const res = await fetch('http://localhost:8000/api/qa/chats');
       const data = await res.json();
-      console.log("6 got json", data);
 
       const chatList = data.chats || [];
-
       setChats(chatList);
 
       if (chatList.length > 0) {
-        await selectChat(chatList[0].chat_id);
+        const savedChatId = localStorage.getItem('sahayak_current_chat');
+        const exists = chatList.some(
+          (c) => (c.chat_id || c.id) === savedChatId
+        );
+        const targetId = exists
+          ? savedChatId
+          : chatList[0].chat_id || chatList[0].id;
+        await selectChat(targetId);
       }
     } catch (error) {
       console.error('Error loading chats:', error);
@@ -244,9 +249,31 @@ export default function QAPage() {
       const data = await res.json();
 
       setCurrentChat(chatId);
+      localStorage.setItem('sahayak_current_chat', chatId);
       setMessages(data.messages || []);
     } catch (error) {
       console.error('Error loading chat history:', error);
+    }
+  };
+
+  const toggleSaveChat = async (chatId) => {
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/qa/chats/${chatId}/toggle-save`,
+        {
+          method: 'POST',
+        }
+      );
+      if (!res.ok) throw new Error(`Failed to toggle save (${res.status})`);
+      const data = await res.json();
+
+      setChats((prev) =>
+        prev.map((c) =>
+          (c.chat_id || c.id) === chatId ? { ...c, is_saved: data.is_saved } : c
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling save:', error);
     }
   };
 
@@ -269,11 +296,11 @@ export default function QAPage() {
       const newChat = {
         chat_id: data.chat_id,
         title: data.title,
+        is_saved: false,
         created_at: data.created_at,
       };
 
       setChats((prev) => [newChat, ...prev]);
-
       await selectChat(data.chat_id);
 
       return data.chat_id;
@@ -336,6 +363,13 @@ export default function QAPage() {
             : msg
         )
       );
+
+      // Refresh chat list to update title and sorting order
+      const chatsRes = await fetch('http://localhost:8000/api/qa/chats');
+      if (chatsRes.ok) {
+        const chatsData = await chatsRes.json();
+        setChats(chatsData.chats || []);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages((prev) =>
@@ -363,6 +397,7 @@ export default function QAPage() {
         currentChat={currentChat}
         onSelectChat={selectChat}
         onNewChat={createNewChat}
+        onToggleSave={toggleSaveChat}
       />
 
       {/* Main Chat Area */}
