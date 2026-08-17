@@ -4,7 +4,8 @@ from config import OLLAMA_HOST, OLLAMA_MODEL
 from prompts import OLLAMA_PROMPT, format_history_string
 
 def _sync_call_ollama(question: str, history: list = None) -> str:
-    history_str = format_history_string(history or [], max_turns=3)
+    history_str = format_history_string(history or [], max_turns=5)
+
     prompt = OLLAMA_PROMPT.format(history=history_str, question=question)
     
     # Adjust max output tokens dynamically based on question intent
