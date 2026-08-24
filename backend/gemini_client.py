@@ -1,6 +1,8 @@
 import asyncio
 import google.generativeai as genai
 from routes_settings import get_effective_gemini_key
+from prompts import GEMINI_PROMPT, format_history_string
+
 
 def _sync_call_gemini(question: str, history: list = None) -> str:
     api_key = get_effective_gemini_key()
