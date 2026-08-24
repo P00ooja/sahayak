@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import LessonPlannerForm from '../components/LessonPlanner/LessonPlannerForm';
 import LessonPlanPreview from '../components/LessonPlanner/LessonPlanPreview';
-import { History, BookOpen, Trash2, ArrowRight } from 'lucide-react';
+import { History, BookOpen, Trash2, ArrowRight, Pin } from 'lucide-react';
+
 
 export default function LessonPlannerPage() {
   const [step, setStep] = useState('form'); // 'form' | 'preview'
@@ -85,6 +86,16 @@ export default function LessonPlannerPage() {
     }
   };
 
+  const toggleSavePlan = async (e, id) => {
+    e.stopPropagation();
+    try {
+      await fetch(`http://localhost:8000/api/lesson-planner/${id}/toggle-save`, { method: 'POST' });
+      fetchHistory();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="min-h-screen pb-12 px-4 md:px-8">
       {/* Top Controls Bar */}
@@ -100,16 +111,20 @@ export default function LessonPlannerPage() {
           onClick={() => setShowHistory(!showHistory)}
           className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 transition-colors"
         >
-          <History className="w-3.5 h-3.5" /> Past Plans ({history.length})
+          <History className="w-3.5 h-3.5" /> Recent Plans ({history.length})
         </button>
       </div>
 
       {/* History Drawer */}
       {showHistory && (
         <div className="max-w-4xl mx-auto mb-8 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl animate-in slide-in-from-top-4 duration-200">
-          <h3 className="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-purple-400" /> Saved Lesson Plans
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-purple-400" /> Recent Lesson Plans
+            </h3>
+            <span className="text-[10px] text-slate-400">Keeps 15 recent plans • Pin to save permanently</span>
+          </div>
+          
           {history.length === 0 ? (
             <p className="text-xs text-slate-500">No saved lesson plans yet.</p>
           ) : (
@@ -118,21 +133,38 @@ export default function LessonPlannerPage() {
                 <div
                   key={plan.id}
                   onClick={() => loadSavedPlan(plan.id)}
-                  className="p-3 bg-slate-950/70 border border-slate-800 hover:border-purple-500/50 rounded-xl cursor-pointer transition-all flex items-center justify-between group"
+                  className={`p-3 border rounded-xl cursor-pointer transition-all flex items-center justify-between group ${
+                    plan.is_saved 
+                      ? 'bg-purple-950/20 border-purple-500/40 hover:border-purple-500' 
+                      : 'bg-slate-950/70 border-slate-800 hover:border-slate-700'
+                  }`}
                 >
                   <div className="truncate pr-2">
-                    <div className="text-xs font-semibold text-slate-200 truncate group-hover:text-purple-300">
-                      {plan.topic}
+                    <div className="text-xs font-semibold text-slate-200 truncate group-hover:text-purple-300 flex items-center gap-1.5">
+                      {plan.is_saved && <Pin className="w-3 h-3 text-purple-400 fill-purple-400 shrink-0" />}
+                      <span className="truncate">{plan.topic}</span>
                     </div>
                     <div className="text-[10px] text-slate-500 mt-0.5">
                       Grade {plan.grade_level} • {plan.number_of_classes} Sessions • {plan.offline ? 'Offline' : 'Online'}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={(e) => toggleSavePlan(e, plan.id)}
+                      title={plan.is_saved ? "Unpin Plan" : "Pin Plan (Save permanently)"}
+                      className={`p-1.5 rounded transition-colors ${
+                        plan.is_saved 
+                          ? 'text-purple-400 hover:bg-purple-500/20' 
+                          : 'text-slate-500 hover:text-purple-300 hover:bg-slate-800'
+                      }`}
+                    >
+                      <Pin className={`w-3.5 h-3.5 ${plan.is_saved ? 'fill-purple-400' : ''}`} />
+                    </button>
                     <button
                       onClick={(e) => deletePlan(e, plan.id)}
-                      className="p-1 text-slate-500 hover:text-rose-400 rounded transition-colors"
+                      title="Delete Plan"
+                      className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

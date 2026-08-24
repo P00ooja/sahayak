@@ -63,10 +63,18 @@ def init_db():
             current_plan TEXT NOT NULL,
             model TEXT,
             offline BOOLEAN,
+            is_saved BOOLEAN DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    
+    # Ensure is_saved column exists for existing DBs
+    try:
+        cursor.execute("ALTER TABLE lesson_plans ADD COLUMN is_saved BOOLEAN DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
+
     
     conn.commit()
     conn.close()
