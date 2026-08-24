@@ -66,8 +66,8 @@ def _sync_generate_ollama(topic: str, grade_level: int, number_of_classes: int, 
             "prompt": prompt,
             "stream": False,
             "options": {
-                "num_predict": 1200,
-                "temperature": 0.2
+                "num_predict": 1800,
+                "temperature": 0.3
             }
         },
         timeout=90
