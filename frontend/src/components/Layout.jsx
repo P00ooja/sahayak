@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
-
-import { useState } from 'react';
-import Sidebar from './Sidebar';
-import TopBar from './TopBar';
 import SettingsModal from './SettingsModal';
 
 export default function Layout({ children, onNavigate, currentPage }) {
