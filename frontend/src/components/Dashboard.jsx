@@ -107,6 +107,7 @@ export default function Dashboard({ onNavigate }) {
             icon={BookOpen}
             title="Lesson Planner"
             description="Create detailed, classroom-ready lesson plans from your syllabus"
+            onClick={() => onNavigate('lesson-planner')}
             color="purple"
           />
           <FeatureCard

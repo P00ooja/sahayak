@@ -40,9 +40,37 @@ def init_db():
             FOREIGN KEY (chat_id) REFERENCES chats(id)
         )
     """)
+
+    # Settings table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Lesson Plans table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS lesson_plans (
+            id TEXT PRIMARY KEY,
+            topic TEXT NOT NULL,
+            grade_level INTEGER NOT NULL,
+            number_of_classes INTEGER NOT NULL,
+            minutes_per_class INTEGER NOT NULL,
+            language TEXT DEFAULT 'en',
+            original_plan TEXT NOT NULL,
+            current_plan TEXT NOT NULL,
+            model TEXT,
+            offline BOOLEAN,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     
     conn.commit()
     conn.close()
+
 
 def get_connection():
     """Get database connection"""

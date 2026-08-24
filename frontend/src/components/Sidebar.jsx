@@ -43,8 +43,8 @@
 import { Home, FileText, BookOpen, Settings, X } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Sidebar({ open }) {
-  const [activeItem, setActiveItem] = useState('home');
+export default function Sidebar({ open, onNavigate, currentPage, onOpenSettings }) {
+
 
   return (
     <div className={`fixed lg:static bg-gray-800 text-white h-screen w-64 transform lg:transform-none transition-transform duration-300 z-40 ${!open ? '-translate-x-full' : ''}`}>
@@ -65,32 +65,30 @@ export default function Sidebar({ open }) {
         <NavItem
           icon={Home}
           label="Home"
-          id="home"
-          active={activeItem === 'home'}
-          onClick={() => setActiveItem('home')}
+          id="dashboard"
+          active={currentPage === 'dashboard'}
+          onClick={() => onNavigate && onNavigate('dashboard')}
+        />
+        <NavItem
+          icon={BookOpen}
+          label="Lesson Planner"
+          id="lesson-planner"
+          active={currentPage === 'lesson-planner'}
+          onClick={() => onNavigate && onNavigate('lesson-planner')}
         />
         <NavItem
           icon={FileText}
           label="Recent Files"
           id="recent"
-          active={activeItem === 'recent'}
+          active={false}
           comingSoon
-          onClick={() => setActiveItem('recent')}
-        />
-        <NavItem
-          icon={BookOpen}
-          label="Saved Worksheets"
-          id="saved"
-          active={activeItem === 'saved'}
-          comingSoon
-          onClick={() => setActiveItem('saved')}
         />
         <NavItem
           icon={Settings}
           label="Settings"
           id="settings"
-          active={activeItem === 'settings'}
-          onClick={() => setActiveItem('settings')}
+          active={false}
+          onClick={onOpenSettings}
         />
       </nav>
 

@@ -63,7 +63,8 @@
 import { Menu, Settings, Wifi, WifiOff, Bell } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-export default function TopBar({ onMenuClick }) {
+export default function TopBar({ onMenuClick, onOpenSettings }) {
+
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -117,25 +118,12 @@ export default function TopBar({ onMenuClick }) {
 
         <div className="relative">
           <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="hover:bg-gray-700 p-2 rounded-lg"
+            onClick={onOpenSettings}
+            className="hover:bg-gray-700 p-2 rounded-lg text-gray-300 hover:text-white transition-colors"
+            title="App Settings (Gemini API Key)"
           >
-            <Settings size={24} />
+            <Settings size={22} />
           </button>
-
-          {showSettings && (
-            <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
-              <button className="w-full text-left px-4 py-2 hover:bg-gray-700 rounded-t-lg">
-                Settings
-              </button>
-              <button className="w-full text-left px-4 py-2 hover:bg-gray-700">
-                Help
-              </button>
-              <button className="w-full text-left px-4 py-2 hover:bg-gray-700 rounded-b-lg text-red-400">
-                Logout
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

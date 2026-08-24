@@ -27,6 +27,14 @@ from config import DEBUG
 # Initialize database on startup
 init_db()
 
+# Import and include feature routers
+from routes_settings import router as settings_router
+from routes_lesson_planner import router as lesson_planner_router
+
+app.include_router(settings_router)
+app.include_router(lesson_planner_router)
+
+
 # ============ HEALTH CHECK ============
 
 @app.get("/api/health")
