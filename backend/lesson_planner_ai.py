@@ -27,25 +27,57 @@ def clean_and_parse_json(text: str) -> dict:
         
     return json.loads(cleaned)
 
+def extract_subtopics(topic: str) -> list:
+    """Extract individual numbered or bulleted subtopics from input text"""
+    # Look for numbered sections like 1.1 Introduction 1.2 Sets...
+    matches = re.findall(r"(?:\d+\.\d+|\d+\.)\s*([A-Za-z\s]+)", topic)
+    subtopics = [m.strip() for m in matches if len(m.strip()) > 2]
+    
+    if not subtopics:
+        # Fallback to splitting by commas or semicolons
+        parts = re.split(r"[,;\n]+", topic)
+        subtopics = [p.strip() for p in parts if len(p.strip()) > 2]
+        
+    return subtopics
+
 def create_fallback_plan(topic: str, grade_level: int, number_of_classes: int, minutes_per_class: int) -> dict:
-    """Fallback generator if model JSON generation fails"""
+    """Intelligent fallback generator if model JSON generation fails"""
+    subtopics = extract_subtopics(topic)
+    clean_title = topic.split("1.1")[0].strip() if "1.1" in topic else topic.strip()
+    if len(clean_title) > 50:
+        clean_title = clean_title[:47] + "..."
+
+    classes_data = []
+    num_sub = len(subtopics)
+
+    for i in range(1, number_of_classes + 1):
+        if subtopics:
+            # Distribute subtopics across classes
+            idx_start = ((i - 1) * max(1, num_sub // number_of_classes)) % num_sub
+            current_topics = subtopics[idx_start:idx_start + 2]
+            if not current_topics:
+                current_topics = [subtopics[i % num_sub]]
+        else:
+            current_topics = [f"Foundations of {clean_title}", f"Core Application & Examples Part {i}"]
+
+        class_title = f"Class {i}: {current_topics[0]}" if current_topics else f"Class {i}: {clean_title} Session {i}"
+
+        classes_data.append({
+            "class_number": i,
+            "title": class_title,
+            "duration_minutes": minutes_per_class,
+            "topics": current_topics,
+            "teaching_strategies": ["Interactive Lecture", "Direct Instruction & Examples"],
+            "activities": ["Guided Practice & Exercises", "Classroom Problem Solving"],
+            "assessment": "Formative Q&A & Exit Ticket"
+        })
+
     return {
-        "title": f"Lesson Plan: {topic}",
+        "title": f"Lesson Plan: {clean_title}",
         "grade_level": grade_level,
         "number_of_classes": number_of_classes,
         "minutes_per_class": minutes_per_class,
-        "classes": [
-            {
-                "class_number": i,
-                "title": f"Class {i}: Introduction to {topic}" if i == 1 else f"Class {i}: Advanced {topic} Concepts",
-                "duration_minutes": minutes_per_class,
-                "topics": [f"Key Concept {j}" for j in range(1, 3)],
-                "teaching_strategies": ["Interactive Discussion", "Direct Instruction"],
-                "activities": ["Guided Group Activity", "Class Problem Solving"],
-                "assessment": "Formative Q&A & Exit Ticket"
-            }
-            for i in range(1, number_of_classes + 1)
-        ]
+        "classes": classes_data
     }
 
 def _sync_generate_ollama(topic: str, grade_level: int, number_of_classes: int, minutes_per_class: int) -> dict:
@@ -70,8 +102,9 @@ def _sync_generate_ollama(topic: str, grade_level: int, number_of_classes: int, 
                 "temperature": 0.3
             }
         },
-        timeout=90
+        timeout=120
     )
+
     
     if response.status_code == 200:
         data = response.json()
