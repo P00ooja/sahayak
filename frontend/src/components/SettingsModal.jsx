@@ -36,7 +36,7 @@ export default function SettingsModal({ isOpen, onClose }) {
       const res = await fetch('http://localhost:8000/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ custom_gemini_api_key: apiKey.strip ? apiKey.strip() : apiKey })
+        body: JSON.stringify({ custom_gemini_api_key: apiKey.trim() })
       });
 
       const data = await res.json();

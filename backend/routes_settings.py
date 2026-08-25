@@ -37,18 +37,20 @@ def get_effective_gemini_key() -> str:
         return custom_key.strip()
     return DEFAULT_GEMINI_KEY
 
+import requests
+
 def _sync_verify_gemini_key(api_key: str) -> bool:
-    """Synchronously test if a Gemini API key is valid"""
+    """Synchronously test if a Gemini API key is valid via fast HTTP REST check"""
     if not api_key or not api_key.strip():
         return False
     try:
-        genai.configure(api_key=api_key.strip())
-        model = genai.GenerativeModel("gemini-2.5-flash")
-        response = model.generate_content("Ping", request_options={"timeout": 10})
-        return bool(response and response.text)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key.strip()}"
+        res = requests.get(url, timeout=5)
+        return res.status_code == 200
     except Exception as e:
         print(f"Key verification error: {str(e)}")
         return False
+
 
 @router.get("")
 async def get_settings():
